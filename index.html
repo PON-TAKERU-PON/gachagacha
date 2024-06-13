@@ -12,16 +12,22 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 200px;
+      width: 300px;
       margin: 0 auto;
     }
     #gacha-machine {
       position: relative;
-      width: 150px;
-      height: 150px;
+      width: 200px;
+      height: 250px;
       margin-bottom: 20px;
-      border: 5px solid #333;
       background: #f5f5f5;
+      border: 5px solid #333;
+    }
+    #gacha-top {
+      width: 200px;
+      height: 150px;
+      background: #f5f5f5;
+      border-bottom: 5px solid #333;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -30,20 +36,21 @@
       width: 50px;
       height: 50px;
       background: #333;
-      position: absolute;
-      bottom: -25px;
-      left: calc(50% - 25px);
       border-radius: 50%;
+      position: absolute;
+      bottom: 30px;
+      left: calc(50% - 25px);
       cursor: pointer;
       transition: transform 3s ease;
     }
     #gacha-output {
-      position: absolute;
       width: 80px;
-      height: 50px;
+      height: 80px;
       background: #fff;
       border: 2px solid #333;
-      bottom: -60px;
+      border-radius: 50%;
+      position: absolute;
+      bottom: -40px;
       left: calc(50% - 40px);
       display: flex;
       justify-content: center;
@@ -53,7 +60,7 @@
     }
     #gacha-output.show {
       opacity: 1;
-      bottom: -70px;
+      bottom: -60px;
     }
     #gacha-button {
       margin-top: 40px;
@@ -71,7 +78,6 @@
       justify-content: center;
       font-size: 14px;
       font-weight: bold;
-      display: none;
     }
   </style>
 </head>
@@ -79,6 +85,7 @@
   <h1>ランダムリーダー選出</h1>
   <div id="gacha-container">
     <div id="gacha-machine">
+      <div id="gacha-top"></div>
       <div id="gacha-handle"></div>
       <div id="gacha-output"></div>
     </div>
@@ -138,7 +145,7 @@
         output.classList.add('show');
 
         // Update leaders.json on GitHub
-        fetch('https://api.github.com/repos/PON-TAKERU-PON/random-gacha/dispatches', {
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/gachagacha/dispatches', {
           method: 'POST',
           headers: {
             'Authorization': 'token GH_TOKEN',
