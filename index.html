@@ -9,15 +9,32 @@
   <p id="leader"></p>
 
   <script>
-    function selectLeader() {
-      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-      const targetUrl = 'https://script.google.com/macros/s/AKfycbwO_U0AqR4KIXmfHnlw9eyIDtxPAi9DH8lokkRsw6BXKMHcZnNwXBzRj0M8PD3YrfXA/exec';
-      fetch(proxyUrl + targetUrl)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('leader').innerText = '本日のリーダー: ' + data.leader;
-        })
-        .catch(error => console.error('Error:', error));
+    async function selectLeader() {
+      const response = await fetch('leaders.json');
+      const data = await response.json();
+      const leaders = data.leaders;
+      const chosen = data.chosen;
+
+      let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
+      
+      if (availableLeaders.length === 0) {
+        availableLeaders = leaders;
+        data.chosen = [];
+      }
+
+      const randomIndex = Math.floor(Math.random() * availableLeaders.length);
+      const selectedLeader = availableLeaders[randomIndex];
+      data.chosen.push(selectedLeader);
+
+      document.getElementById('leader').innerText = '本日のリーダー: ' + selectedLeader;
+
+      await fetch('update-leaders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
     }
   </script>
 </body>
