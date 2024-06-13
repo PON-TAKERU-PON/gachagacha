@@ -15,19 +15,24 @@
       const leaders = data.leaders;
       let chosen = data.chosen;
 
+      // 選ばれていないリーダーを取得
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
 
+      // すべてのリーダーが選ばれた場合、リストをリセット
       if (availableLeaders.length === 0) {
         availableLeaders = leaders;
         chosen = [];
       }
 
+      // ランダムにリーダーを選出
       const randomIndex = Math.floor(Math.random() * availableLeaders.length);
       const selectedLeader = availableLeaders[randomIndex];
       chosen.push(selectedLeader);
 
+      // リーダーを表示
       document.getElementById('leader').innerText = '本日のリーダー: ' + selectedLeader;
 
+      // leaders.jsonファイルを更新
       await fetch('https://api.github.com/repos/PON-TAKERU-PON/random-picker/dispatches', {
         method: 'POST',
         headers: {
