@@ -8,25 +8,36 @@
       text-align: center;
       margin: 50px;
     }
-    #container {
-      position: relative;
+    #wheel {
+      margin: 20px auto;
       width: 300px;
       height: 300px;
-      margin: 0 auto;
+      border-radius: 50%;
+      position: relative;
+      border: 5px solid #333;
     }
-    .paper {
+    #wheel .sector {
       position: absolute;
-      width: 300px;
-      height: 50px;
-      background-color: #fff;
-      border: 1px solid #333;
-      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-      line-height: 50px;
-      font-size: 18px;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+      transform-origin: 50% 50%;
+      text-align: center;
+      line-height: 150px;
+      font-size: 14px;
       font-weight: bold;
-      transition: transform 2s ease;
     }
-    #draw {
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #333;
+      margin: 20px auto;
+      position: relative;
+      top: -350px;
+    }
+    #spin {
       margin: 20px;
       padding: 10px 20px;
       font-size: 16px;
@@ -35,31 +46,32 @@
 </head>
 <body>
   <h1>ランダムリーダー選出</h1>
-  <div id="container"></div>
-  <button id="draw" onclick="drawPaper()">くじを引く</button>
+  <div id="pointer"></div>
+  <div id="wheel">
+    <div class="sector" style="background: #f00; transform: rotate(0deg);"><span>森さん</span></div>
+    <div class="sector" style="background: #ff8000; transform: rotate(40deg);"><span>小寺さん</span></div>
+    <div class="sector" style="background: #ff0; transform: rotate(80deg);"><span>櫻井さん</span></div>
+    <div class="sector" style="background: #80ff00; transform: rotate(120deg);"><span>斎藤さん</span></div>
+    <div class="sector" style="background: #0f0; transform: rotate(160deg);"><span>佐藤さん</span></div>
+    <div class="sector" style="background: #00ff80; transform: rotate(200deg);"><span>川崎さん</span></div>
+    <div class="sector" style="background: #0ff; transform: rotate(240deg);"><span>丸田さん</span></div>
+    <div class="sector" style="background: #0080ff; transform: rotate(280deg);"><span>染谷さん</span></div>
+    <div class="sector" style="background: #f0f; transform: rotate(320deg);"><span>石黒さん</span></div>
+  </div>
+  <button id="spin" onclick="spinWheel()">Spin the Wheel</button>
   <p id="leader"></p>
 
   <script>
-    const leaders = ["森さん", "小寺さん", "櫻井さん", "斎藤さん", "佐藤さん", "川崎さん", "染谷さん", "丸田さん", "石黒さん"];
+    const leaders = ["森さん", "小寺さん", "櫻井さん", "斎藤さん", "佐藤さん", "川崎さん", "丸田さん", "染谷さん", "石黒さん"];
     let chosen = [];
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    async function drawPaper() {
-      const container = document.getElementById('container');
+    async function spinWheel() {
+      const wheel = document.getElementById('wheel');
       const leaderElement = document.getElementById('leader');
-      const drawButton = document.getElementById('draw');
+      const spinButton = document.getElementById('spin');
 
-      // Disable the button while drawing
-      drawButton.disabled = true;
-
-      // Clear previous papers
-      container.innerHTML = '';
+      // Disable the button while spinning
+      spinButton.disabled = true;
 
       // Get available leaders
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
@@ -70,54 +82,40 @@
         chosen = [];
       }
 
-      // Shuffle the available leaders
-      shuffle(availableLeaders);
+      // Select a random leader
+      const randomIndex = Math.floor(Math.random() * availableLeaders.length);
+      const selectedLeader = availableLeaders[randomIndex];
 
-      // Create paper elements
-      availableLeaders.forEach((leader, index) => {
-        const paper = document.createElement('div');
-        paper.className = 'paper';
-        paper.style.top = `${index * 60}px`;
-        paper.innerText = leader;
-        container.appendChild(paper);
-      });
+      // Spin the wheel
+      const rotations = Math.floor(Math.random() * 5) + 5; // 5-10 full rotations
+      const sectorAngle = 40; // 360 degrees / 9 sectors = 40 degrees per sector
+      const angle = (randomIndex * sectorAngle) + (rotations * 360);
 
-      // Draw the paper
+      wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+      wheel.style.transform = `rotate(${angle}deg)`;
+
+      // Update chosen list after the spin ends
       setTimeout(() => {
-        const selectedLeader = availableLeaders[0];
         chosen.push(selectedLeader);
-
-        const papers = document.querySelectorAll('.paper');
-        papers.forEach((paper, index) => {
-          if (index === 0) {
-            paper.style.transform = 'translateY(-300px)';
-          } else {
-            paper.style.transform = `translateY(${index * 60 - 60}px)`;
-          }
+        leaderElement.innerText = `本日のリーダー: ${selectedLeader}`;
+        
+        // Update leaders.json on GitHub
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/random-selector/dispatches', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'token GH_TOKEN',
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            event_type: 'update-leaders',
+            client_payload: { leaders: leaders, chosen: chosen }
+          })
         });
 
-        // Display the selected leader after the animation
-        setTimeout(() => {
-          leaderElement.innerText = `本日のリーダー: ${selectedLeader}`;
-
-          // Update leaders.json on GitHub
-          fetch('https://api.github.com/repos/PON-TAKERU-PON/random-leader-select/dispatches', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'token GH_TOKEN',
-              'Accept': 'application/vnd.github.v3+json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              event_type: 'update-leaders',
-              client_payload: { leaders: leaders, chosen: chosen }
-            })
-          });
-
-          // Enable the button again
-          drawButton.disabled = false;
-        }, 2000); // 2 seconds
-      }, 100); // 0.1 seconds
+        // Enable the button again
+        spinButton.disabled = false;
+      }, 4000); // 4 seconds
     }
   </script>
 </body>
