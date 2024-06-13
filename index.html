@@ -13,31 +13,31 @@
       const response = await fetch('leaders.json');
       const data = await response.json();
       const leaders = data.leaders;
-      const chosen = data.chosen;
+      let chosen = data.chosen;
 
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
       
       if (availableLeaders.length === 0) {
         availableLeaders = leaders;
-        data.chosen = [];
+        chosen = [];
       }
 
       const randomIndex = Math.floor(Math.random() * availableLeaders.length);
       const selectedLeader = availableLeaders[randomIndex];
-      data.chosen.push(selectedLeader);
+      chosen.push(selectedLeader);
 
       document.getElementById('leader').innerText = '本日のリーダー: ' + selectedLeader;
 
       await fetch('https://api.github.com/repos/PON-TAKERU-PON/random-picker/dispatches', {
         method: 'POST',
         headers: {
-          'Authorization': 'token GH-TOKEN',
+          'Authorization': 'token GH_TOKEN',
           'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           event_type: 'update-leaders',
-          client_payload: data
+          client_payload: { leaders: leaders, chosen: chosen }
         })
       });
     }
