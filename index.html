@@ -42,7 +42,7 @@
         },
         body: JSON.stringify({
           event_type: 'update-leaders',
-          client_payload: { leaders: leaders, chosen: chosen }
+          client_payload: JSON.stringify({ leaders: leaders, chosen: chosen })
         })
       });
     }
