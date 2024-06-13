@@ -16,7 +16,7 @@
       let chosen = data.chosen;
 
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
-      
+
       if (availableLeaders.length === 0) {
         availableLeaders = leaders;
         chosen = [];
