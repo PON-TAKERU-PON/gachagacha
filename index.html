@@ -8,61 +8,83 @@
       text-align: center;
       margin: 50px;
     }
+    #gacha-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 200px;
+      margin: 0 auto;
+    }
     #gacha-machine {
       position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 0 auto;
+      width: 150px;
+      height: 150px;
+      margin-bottom: 20px;
       border: 5px solid #333;
-      border-radius: 50%;
       background: #f5f5f5;
-      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    #gacha-spinner {
-      width: 100%;
-      height: 100%;
-      background: #aaa;
-      position: absolute;
-      top: 0;
-      left: 0;
-      border-radius: 50%;
-    }
-    #gacha-window {
+    #gacha-handle {
       width: 50px;
       height: 50px;
+      background: #333;
       position: absolute;
       bottom: -25px;
       left: calc(50% - 25px);
-      background: #fff;
       border-radius: 50%;
+      cursor: pointer;
+      transition: transform 3s ease;
+    }
+    #gacha-output {
+      position: absolute;
+      width: 80px;
+      height: 50px;
+      background: #fff;
       border: 2px solid #333;
+      bottom: -60px;
+      left: calc(50% - 40px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 1s ease, bottom 1s ease;
+    }
+    #gacha-output.show {
+      opacity: 1;
+      bottom: -70px;
+    }
+    #gacha-button {
+      margin-top: 40px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    .ball {
+      width: 40px;
+      height: 40px;
+      background-color: #fff;
+      border: 1px solid #333;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
       font-weight: bold;
-      opacity: 0;
-      transition: opacity 0.5s ease, bottom 0.5s ease;
-    }
-    #gacha-button {
-      margin: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      display: none;
     }
   </style>
 </head>
 <body>
   <h1>ランダムリーダー選出</h1>
-  <div id="gacha-machine">
-    <div id="gacha-spinner"></div>
-    <div id="gacha-window"></div>
+  <div id="gacha-container">
+    <div id="gacha-machine">
+      <div id="gacha-handle"></div>
+      <div id="gacha-output"></div>
+    </div>
   </div>
   <button id="gacha-button" onclick="drawBall()">ガチャガチャを回す</button>
-  <p id="gacha-output"></p>
+  <p id="gacha-output-text"></p>
 
   <script>
     const leaders = ["森さん", "小寺さん", "櫻井さん", "斎藤さん", "佐藤さん", "川崎さん", "丸田さん", "染谷さん", "石黒さん"];
@@ -76,16 +98,17 @@
     }
 
     async function drawBall() {
-      const spinner = document.getElementById('gacha-spinner');
-      const window = document.getElementById('gacha-window');
-      const gachaButton = document.getElementById('gacha-button');
+      const handle = document.getElementById('gacha-handle');
       const output = document.getElementById('gacha-output');
+      const gachaButton = document.getElementById('gacha-button');
+      const outputText = document.getElementById('gacha-output-text');
 
       // Disable the button while drawing
       gachaButton.disabled = true;
 
       // Clear previous output
-      output.innerHTML = '';
+      outputText.innerHTML = '';
+      output.style.opacity = 0;
 
       // Get available leaders
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
@@ -99,24 +122,23 @@
       // Shuffle the available leaders
       shuffle(availableLeaders);
 
-      // Start the spinner
-      spinner.style.animation = 'spin 3s ease-in-out';
+      // Start the handle rotation
+      handle.style.transform = 'rotate(360deg)';
 
       // Draw the ball
       setTimeout(() => {
         const selectedLeader = availableLeaders[0];
         chosen.push(selectedLeader);
 
-        // Stop the spinner
-        spinner.style.animation = '';
+        // Stop the handle rotation
+        handle.style.transform = '';
 
         // Display the selected ball
-        window.innerText = selectedLeader;
-        window.style.opacity = 1;
-        window.style.bottom = '10px';
+        output.innerText = selectedLeader;
+        output.classList.add('show');
 
         // Update leaders.json on GitHub
-        fetch('https://api.github.com/repos/PON-TAKERU-PON/pick/dispatches', {
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/random-gacha/dispatches', {
           method: 'POST',
           headers: {
             'Authorization': 'token GH_TOKEN',
@@ -136,4 +158,3 @@
   </script>
 </body>
 </html>
-
