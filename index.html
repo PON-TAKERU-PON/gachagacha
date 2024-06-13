@@ -8,17 +8,44 @@
       text-align: center;
       margin: 50px;
     }
-    #gacha-container {
+    #gacha-machine {
       position: relative;
-      width: 300px;
+      width: 200px;
       height: 300px;
       margin: 0 auto;
       border: 5px solid #333;
-      border-radius: 50%;
+      border-radius: 10px;
+      background: #f5f5f5;
       overflow: hidden;
     }
-    .ball {
+    #gacha-spinner {
+      width: 100%;
+      height: 50%;
+      background: #aaa;
       position: absolute;
+      top: 0;
+      left: 0;
+      animation: spin 2s linear infinite;
+    }
+    #gacha-window {
+      width: 100%;
+      height: 50%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background: #fff;
+    }
+    #gacha-button {
+      margin: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #gacha-output {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .ball {
       width: 50px;
       height: 50px;
       background-color: #fff;
@@ -29,11 +56,10 @@
       justify-content: center;
       font-size: 14px;
       font-weight: bold;
-    }
-    #draw {
-      margin: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
+      position: absolute;
+      bottom: 10px;
+      left: calc(50% - 25px);
+      display: none;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -43,9 +69,12 @@
 </head>
 <body>
   <h1>ランダムリーダー選出</h1>
-  <div id="gacha-container"></div>
-  <button id="draw" onclick="drawBall()">ガチャガチャを回す</button>
-  <p id="leader"></p>
+  <div id="gacha-machine">
+    <div id="gacha-spinner"></div>
+    <div id="gacha-window"></div>
+  </div>
+  <button id="gacha-button" onclick="drawBall()">ガチャガチャを回す</button>
+  <div id="gacha-output"></div>
 
   <script>
     const leaders = ["森さん", "小寺さん", "櫻井さん", "斎藤さん", "佐藤さん", "川崎さん", "丸田さん", "染谷さん", "石黒さん"];
@@ -58,27 +87,16 @@
       }
     }
 
-    function createBalls(leaders) {
-      const container = document.getElementById('gacha-container');
-      container.innerHTML = '';
-
-      leaders.forEach((leader, index) => {
-        const angle = (index / leaders.length) * 360;
-        const ball = document.createElement('div');
-        ball.className = 'ball';
-        ball.style.transform = `rotate(${angle}deg) translate(120px) rotate(-${angle}deg)`;
-        ball.innerText = leader;
-        container.appendChild(ball);
-      });
-    }
-
     async function drawBall() {
-      const container = document.getElementById('gacha-container');
-      const leaderElement = document.getElementById('leader');
-      const drawButton = document.getElementById('draw');
+      const spinner = document.getElementById('gacha-spinner');
+      const output = document.getElementById('gacha-output');
+      const gachaButton = document.getElementById('gacha-button');
 
       // Disable the button while drawing
-      drawButton.disabled = true;
+      gachaButton.disabled = true;
+
+      // Clear previous output
+      output.innerHTML = '';
 
       // Get available leaders
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
@@ -92,21 +110,26 @@
       // Shuffle the available leaders
       shuffle(availableLeaders);
 
-      // Create balls
-      createBalls(availableLeaders);
-
-      // Spin the balls
-      container.style.animation = 'spin 3s ease-in-out';
+      // Start the spinner
+      spinner.style.animation = 'spin 2s linear infinite';
 
       // Draw the ball
       setTimeout(() => {
         const selectedLeader = availableLeaders[0];
         chosen.push(selectedLeader);
 
-        leaderElement.innerText = `本日のリーダー: ${selectedLeader}`;
+        // Stop the spinner
+        spinner.style.animation = '';
+
+        // Display the selected ball
+        const ball = document.createElement('div');
+        ball.className = 'ball';
+        ball.innerText = selectedLeader;
+        ball.style.display = 'flex';
+        output.appendChild(ball);
 
         // Update leaders.json on GitHub
-        fetch('https://api.github.com/repos/PON-TAKERU-PON/random/dispatches', {
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/selector/dispatches', {
           method: 'POST',
           headers: {
             'Authorization': 'token GH_TOKEN',
@@ -119,12 +142,9 @@
           })
         });
 
-        // Reset the container and enable the button again
-        setTimeout(() => {
-          container.style.animation = '';
-          drawButton.disabled = false;
-        }, 1000);
-      }, 3000); // 3 seconds
+        // Enable the button again
+        gachaButton.disabled = false;
+      }, 2000); // 2 seconds
     }
   </script>
 </body>
