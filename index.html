@@ -8,70 +8,77 @@
       text-align: center;
       margin: 50px;
     }
-    #wheel {
-      margin: 20px auto;
+    #gacha-container {
+      position: relative;
       width: 300px;
       height: 300px;
-      border-radius: 50%;
-      position: relative;
+      margin: 0 auto;
       border: 5px solid #333;
+      border-radius: 50%;
+      overflow: hidden;
     }
-    #wheel .sector {
+    .ball {
       position: absolute;
-      width: 100%;
-      height: 100%;
-      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
-      transform-origin: 50% 50%;
-      text-align: center;
-      line-height: 150px;
+      width: 50px;
+      height: 50px;
+      background-color: #fff;
+      border: 1px solid #333;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 14px;
       font-weight: bold;
     }
-    #pointer {
-      width: 0;
-      height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 30px solid #333;
-      margin: 20px auto;
-      position: relative;
-      top: -350px;
-    }
-    #spin {
+    #draw {
       margin: 20px;
       padding: 10px 20px;
       font-size: 16px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <h1>ランダムリーダー選出</h1>
-  <div id="pointer"></div>
-  <div id="wheel">
-    <div class="sector" style="background: #f00; transform: rotate(0deg);"><span>森さん</span></div>
-    <div class="sector" style="background: #ff8000; transform: rotate(40deg);"><span>小寺さん</span></div>
-    <div class="sector" style="background: #ff0; transform: rotate(80deg);"><span>櫻井さん</span></div>
-    <div class="sector" style="background: #80ff00; transform: rotate(120deg);"><span>斎藤さん</span></div>
-    <div class="sector" style="background: #0f0; transform: rotate(160deg);"><span>佐藤さん</span></div>
-    <div class="sector" style="background: #00ff80; transform: rotate(200deg);"><span>川崎さん</span></div>
-    <div class="sector" style="background: #0ff; transform: rotate(240deg);"><span>丸田さん</span></div>
-    <div class="sector" style="background: #0080ff; transform: rotate(280deg);"><span>染谷さん</span></div>
-    <div class="sector" style="background: #f0f; transform: rotate(320deg);"><span>石黒さん</span></div>
-  </div>
-  <button id="spin" onclick="spinWheel()">Spin the Wheel</button>
+  <div id="gacha-container"></div>
+  <button id="draw" onclick="drawBall()">ガチャガチャを回す</button>
   <p id="leader"></p>
 
   <script>
     const leaders = ["森さん", "小寺さん", "櫻井さん", "斎藤さん", "佐藤さん", "川崎さん", "丸田さん", "染谷さん", "石黒さん"];
     let chosen = [];
 
-    async function spinWheel() {
-      const wheel = document.getElementById('wheel');
-      const leaderElement = document.getElementById('leader');
-      const spinButton = document.getElementById('spin');
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
 
-      // Disable the button while spinning
-      spinButton.disabled = true;
+    function createBalls(leaders) {
+      const container = document.getElementById('gacha-container');
+      container.innerHTML = '';
+
+      leaders.forEach((leader, index) => {
+        const angle = (index / leaders.length) * 360;
+        const ball = document.createElement('div');
+        ball.className = 'ball';
+        ball.style.transform = `rotate(${angle}deg) translate(120px) rotate(-${angle}deg)`;
+        ball.innerText = leader;
+        container.appendChild(ball);
+      });
+    }
+
+    async function drawBall() {
+      const container = document.getElementById('gacha-container');
+      const leaderElement = document.getElementById('leader');
+      const drawButton = document.getElementById('draw');
+
+      // Disable the button while drawing
+      drawButton.disabled = true;
 
       // Get available leaders
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
@@ -82,25 +89,24 @@
         chosen = [];
       }
 
-      // Select a random leader
-      const randomIndex = Math.floor(Math.random() * availableLeaders.length);
-      const selectedLeader = availableLeaders[randomIndex];
+      // Shuffle the available leaders
+      shuffle(availableLeaders);
 
-      // Spin the wheel
-      const rotations = Math.floor(Math.random() * 5) + 5; // 5-10 full rotations
-      const sectorAngle = 40; // 360 degrees / 9 sectors = 40 degrees per sector
-      const angle = (randomIndex * sectorAngle) + (rotations * 360);
+      // Create balls
+      createBalls(availableLeaders);
 
-      wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
-      wheel.style.transform = `rotate(${angle}deg)`;
+      // Spin the balls
+      container.style.animation = 'spin 3s ease-in-out';
 
-      // Update chosen list after the spin ends
+      // Draw the ball
       setTimeout(() => {
+        const selectedLeader = availableLeaders[0];
         chosen.push(selectedLeader);
+
         leaderElement.innerText = `本日のリーダー: ${selectedLeader}`;
-        
+
         // Update leaders.json on GitHub
-        fetch('https://api.github.com/repos/PON-TAKERU-PON/random-selector/dispatches', {
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/random-leader-selector/dispatches', {
           method: 'POST',
           headers: {
             'Authorization': 'token GH_TOKEN',
@@ -113,9 +119,12 @@
           })
         });
 
-        // Enable the button again
-        spinButton.disabled = false;
-      }, 4000); // 4 seconds
+        // Reset the container and enable the button again
+        setTimeout(() => {
+          container.style.animation = '';
+          drawButton.disabled = false;
+        }, 1000);
+      }, 3000); // 3 seconds
     }
   </script>
 </body>
