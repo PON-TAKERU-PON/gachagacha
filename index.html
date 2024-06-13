@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ランダムリーダー選出</title>
+</head>
+<body>
+  <h1>ランダムリーダー選出</h1>
+  <button onclick="selectLeader()">リーダーを選出する</button>
+  <p id="leader"></p>
+
+  <script>
+    function selectLeader() {
+      fetch('https://script.google.com/macros/s/AKfycbzpQ9zgY6W6zYz3cV2cUr7o0tHyvnZpeORcjWD0fpm-eokyP5flhPmgIf5ctPaWdnPt1Q/exec')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('leader').innerText = '本日のリーダー: ' + data;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
