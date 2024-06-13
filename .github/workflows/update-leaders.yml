@@ -13,7 +13,8 @@ jobs:
 
     - name: Update leaders.json
       run: |
-        echo '${{ github.event.client_payload }}' | jq -r . > leaders.json
+        echo "${{ github.event.client_payload }}" > updated_payload.json
+        jq -r .client_payload updated_payload.json > leaders.json
 
     - name: Commit and push changes
       env:
