@@ -2,49 +2,130 @@
 <html>
 <head>
   <title>ランダムリーダー選出</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+    #wheel {
+      margin: 20px auto;
+      width: 300px;
+      height: 300px;
+      border: 10px solid #333;
+      border-radius: 50%;
+      position: relative;
+    }
+    #wheel:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background: #333;
+      border-radius: 50%;
+      z-index: 1;
+    }
+    #wheel .sector {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip: rect(0px, 300px, 300px, 150px);
+      transform-origin: 50% 50%;
+      transform: rotate(0deg);
+      background: #ddd;
+    }
+    #wheel .sector:nth-child(1) { transform: rotate(40deg); background: #f00; }
+    #wheel .sector:nth-child(2) { transform: rotate(80deg); background: #0f0; }
+    #wheel .sector:nth-child(3) { transform: rotate(120deg); background: #00f; }
+    #wheel .sector:nth-child(4) { transform: rotate(160deg); background: #ff0; }
+    #wheel .sector:nth-child(5) { transform: rotate(200deg); background: #0ff; }
+    #wheel .sector:nth-child(6) { transform: rotate(240deg); background: #f0f; }
+    #wheel .sector:nth-child(7) { transform: rotate(280deg); background: #f90; }
+    #wheel .sector:nth-child(8) { transform: rotate(320deg); background: #09f; }
+    #wheel .sector:nth-child(9) { transform: rotate(360deg); background: #f39; }
+    #spin {
+      margin: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
   <h1>ランダムリーダー選出</h1>
-  <button onclick="selectLeader()">リーダーを選出する</button>
+  <div id="wheel">
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+    <div class="sector"></div>
+  </div>
+  <button id="spin" onclick="spinWheel()">Spin the Wheel</button>
   <p id="leader"></p>
 
   <script>
-    async function selectLeader() {
-      const response = await fetch('leaders.json');
-      const data = await response.json();
-      const leaders = data.leaders;
-      let chosen = data.chosen;
+    const leaders = ["森さん", "小寺さん", "櫻井さん", "斎藤さん", "佐藤さん", "川崎さん", "丸田さん", "染谷さん", "石黒さん"];
+    let chosen = [];
 
-      // 選ばれていないリーダーを取得
+    async function spinWheel() {
+      const wheel = document.getElementById('wheel');
+      const leaderElement = document.getElementById('leader');
+      const spinButton = document.getElementById('spin');
+
+      // Disable the button while spinning
+      spinButton.disabled = true;
+
+      // Get available leaders
       let availableLeaders = leaders.filter(leader => !chosen.includes(leader));
 
-      // すべてのリーダーが選ばれた場合、リストをリセット
+      // Reset if all have been chosen
       if (availableLeaders.length === 0) {
         availableLeaders = leaders;
         chosen = [];
       }
 
-      // ランダムにリーダーを選出
+      // Select a random leader
       const randomIndex = Math.floor(Math.random() * availableLeaders.length);
       const selectedLeader = availableLeaders[randomIndex];
-      chosen.push(selectedLeader);
 
-      // リーダーを表示
-      document.getElementById('leader').innerText = '本日のリーダー: ' + selectedLeader;
+      // Spin the wheel
+      const rotations = Math.floor(Math.random() * 5) + 5; // 5-10 full rotations
+      const sectorAngle = 360 / leaders.length;
+      const angle = (randomIndex * sectorAngle) + (rotations * 360);
 
-      // leaders.jsonファイルを更新
-      await fetch('https://api.github.com/repos/PON-TAKERU-PON/random-picker/dispatches', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'token GH_TOKEN',
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          event_type: 'update-leaders',
-          client_payload: JSON.stringify({ leaders: leaders, chosen: chosen })
-        })
-      });
+      wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+      wheel.style.transform = `rotate(${angle}deg)`;
+
+      // Update chosen list after the spin ends
+      setTimeout(() => {
+        chosen.push(selectedLeader);
+        leaderElement.innerText = `本日のリーダー: ${selectedLeader}`;
+        
+        // Update leaders.json on GitHub
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/random-leader-selector/dispatches', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'token GH_TOKEN',
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            event_type: 'update-leaders',
+            client_payload: { leaders: leaders, chosen: chosen }
+          })
+        });
+
+        // Enable the button again
+        spinButton.disabled = false;
+      }, 4000); // 4 seconds
     }
   </script>
 </body>
