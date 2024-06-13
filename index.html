@@ -10,7 +10,9 @@
 
   <script>
     function selectLeader() {
-      fetch('https://script.google.com/macros/s/AKfycbwO_U0AqR4KIXmfHnlw9eyIDtxPAi9DH8lokkRsw6BXKMHcZnNwXBzRj0M8PD3YrfXA/exec')
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      const targetUrl = 'https://script.google.com/macros/s/AKfycbwO_U0AqR4KIXmfHnlw9eyIDtxPAi9DH8lokkRsw6BXKMHcZnNwXBzRj0M8PD3YrfXA/exec';
+      fetch(proxyUrl + targetUrl)
         .then(response => response.json())
         .then(data => {
           document.getElementById('leader').innerText = '本日のリーダー: ' + data.leader;
