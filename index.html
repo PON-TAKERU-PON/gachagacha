@@ -10,10 +10,10 @@
 
   <script>
     function selectLeader() {
-      fetch('https://script.google.com/macros/s/AKfycbyS2AYYJnv1HvjC_4jksdprz7xmwqVoqyxON26y6BR2yL9zQVvcuPfGLZ5eHQT_825C/exec')
-        .then(response => response.text())
+      fetch('https://script.google.com/macros/s/AKfycbyaX6M09oaRhrB8e4af01DxeXGzHrgxEsa4NagG2U9AehM2pRNNb19E-ZkPyr-f8S4C/exec')
+        .then(response => response.json())
         .then(data => {
-          document.getElementById('leader').innerText = '本日のリーダー: ' + data;
+          document.getElementById('leader').innerText = '本日のリーダー: ' + data.leader;
         })
         .catch(error => console.error('Error:', error));
     }
