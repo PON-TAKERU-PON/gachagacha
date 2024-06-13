@@ -67,35 +67,29 @@
     #gacha-output {
       width: 40px;
       height: 40px;
-      background: #fff;
+      background: #ff0000;
       border: 2px solid #333;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       opacity: 0;
-      transition: opacity 1s ease, transform 1s ease;
+      transform: scale(1);
+      transition: opacity 0.5s ease, transform 1s ease;
     }
     #gacha-output.show {
       opacity: 1;
       transform: scale(5);
+      animation: spin 2s linear;
     }
     #gacha-button {
       margin-top: 40px;
       padding: 10px 20px;
       font-size: 16px;
     }
-    .ball {
-      width: 40px;
-      height: 40px;
-      background-color: #fff;
-      border: 1px solid #333;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -164,9 +158,16 @@
         // Display the selected ball
         output.innerText = selectedLeader;
         output.classList.add('show');
+        output.style.opacity = 1;
+
+        // Animate the ball coming out
+        setTimeout(() => {
+          output.style.transform = 'scale(5)';
+          outputText.innerText = `本日のリーダー: ${selectedLeader}`;
+        }, 500); // 0.5 seconds for ball to appear
 
         // Update leaders.json on GitHub
-        fetch('https://api.github.com/repos/PON-TAKERU-PON/leadergacha/dispatches', {
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/rangacha/dispatches', {
           method: 'POST',
           headers: {
             'Authorization': 'token GH_TOKEN',
