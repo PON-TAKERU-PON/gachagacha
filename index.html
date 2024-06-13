@@ -28,12 +28,17 @@
 
       document.getElementById('leader').innerText = '本日のリーダー: ' + selectedLeader;
 
-      await fetch('update-leaders', {
+      await fetch('https://api.github.com/repos/PON-TAKERU-PON/random-picker/dispatches', {
         method: 'POST',
         headers: {
+          'Authorization': 'token YOUR_GITHUB_TOKEN',
+          'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          event_type: 'update-leaders',
+          client_payload: data
+        })
       });
     }
   </script>
