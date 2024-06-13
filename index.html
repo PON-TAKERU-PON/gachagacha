@@ -12,9 +12,9 @@
       margin: 20px auto;
       width: 300px;
       height: 300px;
-      border: 10px solid #333;
       border-radius: 50%;
       position: relative;
+      border: 5px solid #333;
     }
     #wheel .sector {
       position: absolute;
@@ -22,19 +22,11 @@
       height: 100%;
       clip-path: polygon(50% 50%, 100% 0, 100% 100%);
       transform-origin: 50% 50%;
-      text-align: right;
-      padding-right: 20px;
-      box-sizing: border-box;
+      text-align: center;
+      line-height: 150px;
+      font-size: 14px;
+      font-weight: bold;
     }
-    #wheel .sector:nth-child(1) { background: #f00; transform: rotate(0deg); }
-    #wheel .sector:nth-child(2) { background: #ff8000; transform: rotate(40deg); }
-    #wheel .sector:nth-child(3) { background: #ff0; transform: rotate(80deg); }
-    #wheel .sector:nth-child(4) { background: #80ff00; transform: rotate(120deg); }
-    #wheel .sector:nth-child(5) { background: #0f0; transform: rotate(160deg); }
-    #wheel .sector:nth-child(6) { background: #00ff80; transform: rotate(200deg); }
-    #wheel .sector:nth-child(7) { background: #0ff; transform: rotate(240deg); }
-    #wheel .sector:nth-child(8) { background: #0080ff; transform: rotate(280deg); }
-    #wheel .sector:nth-child(9) { background: #f0f; transform: rotate(320deg); }
     #pointer {
       width: 0;
       height: 0;
@@ -43,7 +35,7 @@
       border-bottom: 30px solid #333;
       margin: 20px auto;
       position: relative;
-      top: -320px;
+      top: -350px;
     }
     #spin {
       margin: 20px;
@@ -56,15 +48,15 @@
   <h1>ランダムリーダー選出</h1>
   <div id="pointer"></div>
   <div id="wheel">
-    <div class="sector" style="transform: rotate(0deg);"><span>森さん</span></div>
-    <div class="sector" style="transform: rotate(40deg);"><span>小寺さん</span></div>
-    <div class="sector" style="transform: rotate(80deg);"><span>櫻井さん</span></div>
-    <div class="sector" style="transform: rotate(120deg);"><span>斎藤さん</span></div>
-    <div class="sector" style="transform: rotate(160deg);"><span>佐藤さん</span></div>
-    <div class="sector" style="transform: rotate(200deg);"><span>川崎さん</span></div>
-    <div class="sector" style="transform: rotate(240deg);"><span>丸田さん</span></div>
-    <div class="sector" style="transform: rotate(280deg);"><span>染谷さん</span></div>
-    <div class="sector" style="transform: rotate(320deg);"><span>石黒さん</span></div>
+    <div class="sector" style="background: #f00; transform: rotate(0deg);"><span>森さん</span></div>
+    <div class="sector" style="background: #ff8000; transform: rotate(40deg);"><span>小寺さん</span></div>
+    <div class="sector" style="background: #ff0; transform: rotate(80deg);"><span>櫻井さん</span></div>
+    <div class="sector" style="background: #80ff00; transform: rotate(120deg);"><span>斎藤さん</span></div>
+    <div class="sector" style="background: #0f0; transform: rotate(160deg);"><span>佐藤さん</span></div>
+    <div class="sector" style="background: #00ff80; transform: rotate(200deg);"><span>川崎さん</span></div>
+    <div class="sector" style="background: #0ff; transform: rotate(240deg);"><span>丸田さん</span></div>
+    <div class="sector" style="background: #0080ff; transform: rotate(280deg);"><span>染谷さん</span></div>
+    <div class="sector" style="background: #f0f; transform: rotate(320deg);"><span>石黒さん</span></div>
   </div>
   <button id="spin" onclick="spinWheel()">Spin the Wheel</button>
   <p id="leader"></p>
