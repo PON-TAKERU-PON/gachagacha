@@ -16,38 +16,35 @@
       border-radius: 50%;
       position: relative;
     }
-    #wheel:before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10px;
-      height: 10px;
-      background: #333;
-      border-radius: 50%;
-      z-index: 1;
-    }
     #wheel .sector {
       position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
-      clip: rect(0px, 300px, 300px, 150px);
+      clip-path: polygon(50% 50%, 100% 0, 100% 100%);
       transform-origin: 50% 50%;
-      transform: rotate(0deg);
-      background: #ddd;
+      text-align: right;
+      padding-right: 20px;
+      box-sizing: border-box;
     }
-    #wheel .sector:nth-child(1) { transform: rotate(40deg); background: #f00; }
-    #wheel .sector:nth-child(2) { transform: rotate(80deg); background: #0f0; }
-    #wheel .sector:nth-child(3) { transform: rotate(120deg); background: #00f; }
-    #wheel .sector:nth-child(4) { transform: rotate(160deg); background: #ff0; }
-    #wheel .sector:nth-child(5) { transform: rotate(200deg); background: #0ff; }
-    #wheel .sector:nth-child(6) { transform: rotate(240deg); background: #f0f; }
-    #wheel .sector:nth-child(7) { transform: rotate(280deg); background: #f90; }
-    #wheel .sector:nth-child(8) { transform: rotate(320deg); background: #09f; }
-    #wheel .sector:nth-child(9) { transform: rotate(360deg); background: #f39; }
+    #wheel .sector:nth-child(1) { background: #f00; transform: rotate(0deg); }
+    #wheel .sector:nth-child(2) { background: #ff8000; transform: rotate(40deg); }
+    #wheel .sector:nth-child(3) { background: #ff0; transform: rotate(80deg); }
+    #wheel .sector:nth-child(4) { background: #80ff00; transform: rotate(120deg); }
+    #wheel .sector:nth-child(5) { background: #0f0; transform: rotate(160deg); }
+    #wheel .sector:nth-child(6) { background: #00ff80; transform: rotate(200deg); }
+    #wheel .sector:nth-child(7) { background: #0ff; transform: rotate(240deg); }
+    #wheel .sector:nth-child(8) { background: #0080ff; transform: rotate(280deg); }
+    #wheel .sector:nth-child(9) { background: #f0f; transform: rotate(320deg); }
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #333;
+      margin: 20px auto;
+      position: relative;
+      top: -320px;
+    }
     #spin {
       margin: 20px;
       padding: 10px 20px;
@@ -57,16 +54,17 @@
 </head>
 <body>
   <h1>ランダムリーダー選出</h1>
+  <div id="pointer"></div>
   <div id="wheel">
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
-    <div class="sector"></div>
+    <div class="sector" style="transform: rotate(0deg);"><span>森さん</span></div>
+    <div class="sector" style="transform: rotate(40deg);"><span>小寺さん</span></div>
+    <div class="sector" style="transform: rotate(80deg);"><span>櫻井さん</span></div>
+    <div class="sector" style="transform: rotate(120deg);"><span>斎藤さん</span></div>
+    <div class="sector" style="transform: rotate(160deg);"><span>佐藤さん</span></div>
+    <div class="sector" style="transform: rotate(200deg);"><span>川崎さん</span></div>
+    <div class="sector" style="transform: rotate(240deg);"><span>丸田さん</span></div>
+    <div class="sector" style="transform: rotate(280deg);"><span>染谷さん</span></div>
+    <div class="sector" style="transform: rotate(320deg);"><span>石黒さん</span></div>
   </div>
   <button id="spin" onclick="spinWheel()">Spin the Wheel</button>
   <p id="leader"></p>
@@ -98,7 +96,7 @@
 
       // Spin the wheel
       const rotations = Math.floor(Math.random() * 5) + 5; // 5-10 full rotations
-      const sectorAngle = 360 / leaders.length;
+      const sectorAngle = 40; // 360 degrees / 9 sectors = 40 degrees per sector
       const angle = (randomIndex * sectorAngle) + (rotations * 360);
 
       wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
