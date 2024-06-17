@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ランダムリーダー選出</title>
+  <title>ファシリテータセレクタ</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -95,7 +95,7 @@
   </style>
 </head>
 <body>
-  <h1>ランダムリーダー選出</h1>
+  <h1>ファシリテータセレクタ</h1>
   <div id="gacha-container">
     <div id="gacha-machine">
       <div id="gacha-top"></div>
@@ -164,11 +164,11 @@
         // Animate the ball coming out
         setTimeout(() => {
           output.style.transform = 'scale(5)';
-          outputText.innerText = `本日のリーダー: ${selectedLeader}`;
+          outputText.innerText = `来週のファシリテータ: ${selectedLeader}`;
         }, 500); // 0.5 seconds for ball to appear
 
         // Update leaders.json on GitHub
-        fetch('https://api.github.com/repos/PON-TAKERU-PON/meeting/dispatches', {
+        fetch('https://api.github.com/repos/PON-TAKERU-PON/selector/dispatches', {
           method: 'POST',
           headers: {
             'Authorization': 'token GH_TOKEN',
